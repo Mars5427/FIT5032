@@ -41,7 +41,7 @@
                 role="button"
                 data-bs-toggle="dropdown"
               >
-                {{ user.username }} ({{ user.role }})
+                {{ user.email }} ({{ user.role }})
               </a>
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="#" @click="logout">Logout</a></li>
@@ -52,8 +52,23 @@
       </div>
     </nav>
 
-    <main>
+    <main class="container mt-4">
       <router-view />
+
+      <section class="mt-5">
+        <h2>User Rating</h2>
+        <Rating />
+      </section>
+
+      <section class="mt-5">
+        <h2>Admin Restricted Section</h2>
+        <div v-if="user && user.role === 'admin'">
+          <p>Welcome to the admin-only section. Here you can manage resources.</p>
+        </div>
+        <div v-else>
+          <Unauthorized />
+        </div>
+      </section>
     </main>
 
     <footer class="bg-dark text-light py-3 text-center mt-5">
@@ -65,6 +80,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import Rating from './components/Rating.vue'
+import Unauthorized from './components/Unauthorized.vue'
 
 const router = useRouter()
 const user = ref(null)
@@ -73,6 +90,8 @@ const checkAuth = () => {
   const currentUser = localStorage.getItem('currentUser')
   if (currentUser) {
     user.value = JSON.parse(currentUser)
+  } else {
+    user.value = null
   }
 }
 
@@ -84,7 +103,6 @@ const logout = () => {
 
 onMounted(() => {
   checkAuth()
-  // Listen for storage changes (login/logout from other tabs)
   window.addEventListener('storage', checkAuth)
 })
 </script>
