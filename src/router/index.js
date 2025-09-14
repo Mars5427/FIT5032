@@ -1,19 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-// 引入你的页面组件
+import Admin from '../components/Admin.vue'
+import Unauthorized from '../components/Unauthorized.vue'
 import Form from '../components/Form.vue'
+import Rating from '../components/Rating.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
-import Rating from '../components/Rating.vue'
-import Unauthorized from '../components/Unauthorized.vue'
 
 const routes = [
-  { path: '/', redirect: '/form' },   // 默认跳到表单页
+  { path: '/', redirect: '/form' },
   { path: '/form', component: Form },
+  { path: '/rating', component: Rating },
   { path: '/login', component: Login },
   { path: '/register', component: Register },
-  { path: '/rating', component: Rating },
-  { path: '/unauthorized', component: Unauthorized }
+  { path: '/unauthorized', component: Unauthorized },
+  {
+    path: '/admin',
+    component: Admin,
+    beforeEnter: (to, from, next) => {
+      const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
+      if (user && user.role === 'admin') {
+        next()
+      } else {
+        next('/unauthorized') 
+      }
+    }
+  }
 ]
 
 const router = createRouter({

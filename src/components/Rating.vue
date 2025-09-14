@@ -1,47 +1,75 @@
 <template>
-  <div class="rating">
-    <h3>Rate Our Service</h3>
-    <div v-if="currentUser">
-      <select v-model.number="userRating">
-        <option disabled value="0">Select rating</option>
-        <option v-for="n in 5" :key="n" :value="n">{{ n }}</option>
-      </select>
-      <button @click="submitRating">Submit</button>
-    </div>
-    <div v-else>
-      <p>Please login to rate.</p>
+  <div class="container mt-5" style="max-width: 600px;">
+    <h2>User Rating</h2>
+    <p class="text-muted">Rate Our Service</p>
+
+    <div v-if="!user">
+      <p class="text-danger">Please login to rate.</p>
     </div>
 
-    <div v-if="ratings.length">
-      <p>Average Rating: {{ averageRating.toFixed(2) }} ⭐</p>
+    <div v-else>
+      <div class="mb-3">
+        <label class="form-label">Your Rating:</label>
+        <select v-model="userRating" class="form-select" @change="submitRating">
+          <option disabled value="">Select rating</option>
+          <option v-for="n in 5" :key="n" :value="n">{{ n }} ★</option>
+        </select>
+      </div>
+
+      <div class="mt-4">
+        <h5>Average Rating: 
+          <span class="text-primary">{{ averageRating.toFixed(1) }}</span> ★
+        </h5>
+        <p>Total Ratings: {{ ratings.length }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted } from 'vue'
 
+const user = JSON.parse(localStorage.getItem('currentUser') || 'null')
 const ratings = ref([])
-const userRating = ref(0)
-const currentUser = ref(null)
+const userRating = ref('')
 
 onMounted(() => {
-  const savedRatings = localStorage.getItem("ratings")
-  if (savedRatings) ratings.value = JSON.parse(savedRatings)
+  const saved = localStorage.getItem('ratings')
+  if (saved) ratings.value = JSON.parse(saved)
 
-  const savedUser = localStorage.getItem("currentUser")
-  if (savedUser) currentUser.value = JSON.parse(savedUser)
+  if (user) {
+    const existing = ratings.value.find(r => r.email === user.email)
+    if (existing) {
+      userRating.value = existing.score
+    }
+  }
 })
-
-const submitRating = () => {
-  if (!currentUser.value) return
-  ratings.value.push({ user: currentUser.value.email, value: userRating.value })
-  localStorage.setItem("ratings", JSON.stringify(ratings.value))
-  alert("Thanks for rating!")
-}
 
 const averageRating = computed(() => {
   if (!ratings.value.length) return 0
-  return ratings.value.reduce((sum, r) => sum + r.value, 0) / ratings.value.length
+  const total = ratings.value.reduce((sum, r) => sum + r.score, 0)
+  return total / ratings.value.length
 })
+
+const submitRating = () => {
+  if (!user) return
+
+  const existing = ratings.value.find(r => r.email === user.email)
+  if (existing) {
+    existing.score = parseInt(userRating.value)
+  } else {
+    ratings.value.push({
+      email: user.email,
+      score: parseInt(userRating.value)
+    })
+  }
+  localStorage.setItem('ratings', JSON.stringify(ratings.value))
+  alert('Thank you for your rating!')
+}
 </script>
+
+<style scoped>
+h2 {
+  margin-bottom: 15px;
+}
+</style>
