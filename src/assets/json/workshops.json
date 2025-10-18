@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Stress Busters 101",
+    "date": "2025-10-20",
+    "location": "Melbourne CBD"
+  },
+  {
+    "id": 2,
+    "name": "Mindful Mondays",
+    "date": "2025-10-27",
+    "location": "Clayton"
+  },
+  {
+    "id": 3,
+    "name": "Peer Support Circle",
+    "date": "2025-11-03",
+    "location": "Caulfield"
+  }
+]
