@@ -1,0 +1,5 @@
+[
+  { "id": 1, "title": "Mindfulness Basics", "category": "Education", "source": "Headspace", "url": "https://www.headspace.com" },
+  { "id": 2, "title": "Youth Helpline", "category": "Support", "source": "Lifeline", "url": "https://www.lifeline.org.au" },
+  { "id": 3, "title": "Coping with Exam Stress", "category": "Article", "source": "ReachOut", "url": "https://au.reachout.com" }
+]

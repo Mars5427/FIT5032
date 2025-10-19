@@ -1,49 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Form from '../components/Form.vue'
-import Rating from '../components/Rating.vue'
-import Login from '../components/Login.vue'
-import Register from '../components/Register.vue'
-import Unauthorized from '../components/Unauthorized.vue'
-import Admin from '../components/AdminDashboard.vue'
-import Tables from '../components/Tables.vue'
-import MapView from '../components/MapView.vue'
-import Email from '../components/Email.vue'
-import Export from '../components/Export.vue'
-import Analytics from '../components/Analytics.vue'
-import FirebaseAuth from '../components/FirebaseAuth.vue'
+import { h } from 'vue'
 
-function getCurrentUser(){
-  try { return JSON.parse(localStorage.getItem('currentUser') || 'null') }
-  catch { return null }
-}
+const HomeProbe = { render: () => h('div', { style: 'padding:20px' }, 'ROUTER OK ✅') }
 
 const routes = [
-  { path: '/', redirect: '/form' },
-  { path: '/form', component: Form },
-  { path: '/rating', component: Rating },
-  { path: '/tables', component: Tables },
-  { path: '/map', component: MapView },
-  { path: '/email', component: Email, meta: { requiresAdmin: true } },
-  { path: '/export', component: Export },
-  { path: '/analytics', component: Analytics },
-  { path: '/login', component: Login },
-  { path: '/register', component: Register },
-  { path: '/auth', component: FirebaseAuth },
-  { path: '/unauthorized', component: Unauthorized },
-  { path: '/admin', component: Admin, meta: { requiresAdmin: true } }
+  { path: '/', redirect: '/export' },
+  { path: '/export', component: () => import('../components/Export.vue') },
+  { path: '/map', component: () => import('../components/MapView.vue') },
+  { path: '/tables', component: () => import('../components/Tables.vue') },
+  { path: '/analytics', component: () => import('../components/Analytics.vue') },
+  { path: '/form', component: () => import('../components/Form.vue') },
+  { path: '/rating', component: () => import('../components/Rating.vue') },
+  { path: '/login', component: () => import('../components/Login.vue') },
+  { path: '/register', component: () => import('../components/Register.vue') },
+  { path: '/auth', component: () => import('../components/FirebaseAuth.vue') },
+  { path: '/email', component: () => import('../components/Email.vue'), meta: { requiresAdmin: true } },
+  { path: '/admin', component: () => import('../components/AdminDashboard.vue'), meta: { requiresAdmin: true } },
+  { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
-
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAdmin) {
-    const user = getCurrentUser()
-    if (!user || user.role !== 'admin') return next('/unauthorized')
-  }
-  next()
-})
-
-export default router
+export default createRouter({ history: createWebHistory(), routes })

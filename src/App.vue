@@ -34,7 +34,7 @@
     </nav>
 
     <main id="main" class="container mt-4" tabindex="-1">
-      <router-view />
+      <router-view :key="$route.fullPath" />
     </main>
 
     <footer class="bg-dark text-light py-3 text-center mt-5">

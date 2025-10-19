@@ -10,6 +10,8 @@
 </template>
 
 <script setup>
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 function exportCSV(){
   const ratings = JSON.parse(localStorage.getItem('ratings') || '[]')
   const header = 'email,score\n'
