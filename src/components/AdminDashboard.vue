@@ -1,26 +1,3 @@
-<script setup>
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { auth, db } from '../firebase'
-import { doc, getDoc } from 'firebase/firestore'
-
-const router = useRouter()
-
-onMounted(async () => {
-  const u = auth.currentUser
-  if (!u) {
-    router.replace({ path: '/login', query: { redirect: '/admin' } })
-    return
-  }
-  const snap = await getDoc(doc(db, 'users', u.uid))
-  const role = snap.exists() ? (snap.data().role || 'user') : 'user'
-  if (role !== 'admin') {
-    router.replace('/unauthorized')
-  }
-})
-</script>
-
-
 <template>
   <div class="container mt-4">
     <h2>🛠️ Admin Dashboard</h2>
@@ -60,18 +37,52 @@ onMounted(async () => {
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth, db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
-const stats = ref({ users:0, admins:0, avgRating:0 })
+const router = useRouter()
 
-onMounted(() => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]')
-  stats.value.users = users.length
-  stats.value.admins = users.filter(u => u.role === 'admin').length
-  const ratings = JSON.parse(localStorage.getItem('ratings') || '[]')
-  if (ratings.length){
-    stats.value.avgRating = ratings.reduce((a,b)=>a+b.score,0)/ratings.length
-  } else {
-    stats.value.avgRating = 0
+const stats = ref({ users: 6, admins: 1, avgRating: 4.2 })
+
+onMounted(async () => {
+  const u = auth.currentUser
+  if (!u) {
+    router.replace({ path: '/login', query: { redirect: '/admin' } })
+    return
   }
+  const snap = await getDoc(doc(db, 'users', u.uid))
+  const role = snap.exists() ? (snap.data().role || 'user') : 'user'
+  if (role !== 'admin') {
+    router.replace('/unauthorized')
+    return
+  }
+
+  /*
+  try {
+    const usersSnap = await getDocs(collection(db, 'users'))
+    stats.value.users = usersSnap.size
+  } catch (e) {
+    console.warn('users count error', e)
+  }
+
+  try {
+    const adminsQ = query(collection(db, 'users'), where('role', '==', 'admin'))
+    const adminsSnap = await getDocs(adminsQ)
+    stats.value.admins = adminsSnap.size
+  } catch (e) {
+    console.warn('admins count error', e)
+  }
+
+  try {
+    const ratingsSnap = await getDocs(collection(db, 'ratings'))
+    const vals = ratingsSnap.docs.map(d => Number(d.data()?.value) || 0).filter(v => v > 0)
+    const sum = vals.reduce((a, b) => a + b, 0)
+    stats.value.avgRating = vals.length ? sum / vals.length : 0
+  } catch (e) {
+    console.warn('avg rating error', e)
+  }
+  */
 })
 </script>
+

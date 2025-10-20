@@ -9,8 +9,10 @@ const routes = [
 
   { path: '/', name: 'home', component: () => import('../components/Form.vue'), meta: { requiresAuth: true } },
   { path: '/form', component: () => import('../components/Form.vue'), meta: { requiresAuth: true } },
+  { path: '/rating', component: () => import('../components/Rating.vue'), meta: { requiresAuth: true } },
   { path: '/tables', component: () => import('../components/Tables.vue'), meta: { requiresAuth: true } },
   { path: '/map', component: () => import('../components/MapView.vue'), meta: { requiresAuth: true } },
+  { path: '/email', component: () => import('../components/Email.vue'), meta: { requiresAuth: true } },
   { path: '/analytics', component: () => import('../components/Analytics.vue'), meta: { requiresAuth: true } },
   { path: '/export', component: () => import('../components/Export.vue'), meta: { requiresAuth: true } },
 
