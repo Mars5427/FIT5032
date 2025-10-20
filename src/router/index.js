@@ -1,22 +1,63 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { h } from 'vue'
-
-const HomeProbe = { render: () => h('div', { style: 'padding:20px' }, 'ROUTER OK ✅') }
+import { auth, db } from '../firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
 
 const routes = [
-  { path: '/', redirect: '/export' },
-  { path: '/export', component: () => import('../components/Export.vue') },
-  { path: '/map', component: () => import('../components/MapView.vue') },
-  { path: '/tables', component: () => import('../components/Tables.vue') },
-  { path: '/analytics', component: () => import('../components/Analytics.vue') },
-  { path: '/form', component: () => import('../components/Form.vue') },
-  { path: '/rating', component: () => import('../components/Rating.vue') },
   { path: '/login', component: () => import('../components/Login.vue') },
   { path: '/register', component: () => import('../components/Register.vue') },
-  { path: '/auth', component: () => import('../components/FirebaseAuth.vue') },
-  { path: '/email', component: () => import('../components/Email.vue'), meta: { requiresAdmin: true } },
-  { path: '/admin', component: () => import('../components/AdminDashboard.vue'), meta: { requiresAdmin: true } },
+
+  { path: '/', name: 'home', component: () => import('../components/Form.vue'), meta: { requiresAuth: true } },
+  { path: '/form', component: () => import('../components/Form.vue'), meta: { requiresAuth: true } },
+  { path: '/tables', component: () => import('../components/Tables.vue'), meta: { requiresAuth: true } },
+  { path: '/map', component: () => import('../components/MapView.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics', component: () => import('../components/Analytics.vue'), meta: { requiresAuth: true } },
+  { path: '/export', component: () => import('../components/Export.vue'), meta: { requiresAuth: true } },
+
+  { path: '/admin', name: 'admin', component: () => import('../components/AdminDashboard.vue'), meta: { requiresAuth: true, requiresAdmin: true } },
+
+  { path: '/unauthorized', component: { template: '<div class="container mt-5"><h3>Unauthorized</h3><p>You do not have permission to view this page.</p></div>' } },
+
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
-export default createRouter({ history: createWebHistory(), routes })
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+let authReady = false
+onAuthStateChanged(auth, () => { authReady = true })
+
+async function getUserRole(uid) {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid))
+    return snap.exists() ? (snap.data().role || 'user') : 'user'
+  } catch {
+    return 'user'
+  }
+}
+
+router.beforeEach(async (to, from, next) => {
+  if (!authReady) {
+    await new Promise(resolve => {
+      const stop = onAuthStateChanged(auth, () => { stop(); resolve() })
+    })
+  }
+
+  const requiresAuth = to.meta?.requiresAuth
+  const requiresAdmin = to.meta?.requiresAdmin
+
+  if (requiresAuth && !auth.currentUser) {
+    return next({ path: '/login', query: { redirect: to.fullPath } })
+  }
+
+  if (requiresAdmin) {
+    const role = await getUserRole(auth.currentUser.uid)
+    if (role !== 'admin') return next('/unauthorized')
+  }
+
+  next()
+})
+
+export default router

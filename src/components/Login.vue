@@ -1,38 +1,47 @@
-<template>
-  <div class="container mt-5" style="max-width: 500px;">
-    <h2 class="mb-4">Login</h2>
-    <form @submit.prevent="handleLogin">
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input v-model="email" type="email" id="email" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input v-model="password" type="password" id="password" class="form-control" required />
-      </div>
-      <button type="submit" class="btn btn-primary w-100">Login</button>
-    </form>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
+import { auth } from '../firebase'
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
+const loading = ref(false)
+const errorMsg = ref('')
 const router = useRouter()
 
-const handleLogin = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]')
-  const user = users.find(u => u.email === email.value && u.password === password.value)
+async function loginEmail() {
+  try {
+    loading.value = true
+    const cred = await signInWithEmailAndPassword(auth, email.value.trim(), password.value)
+    localStorage.setItem('currentUser', JSON.stringify({ uid: cred.user.uid, email: cred.user.email }))
+    router.push('/form')
+  } catch (e) {
+    errorMsg.value = e.message || 'Login failed'
+  } finally {
+    loading.value = false
+  }
+}
 
-  if (user) {
-    localStorage.setItem('currentUser', JSON.stringify(user))
-    alert('Login successful!')
-    router.push('/')
-  } else {
-    alert('Invalid email or password')
+async function loginGoogle() {
+  try {
+    const provider = new GoogleAuthProvider()
+    const cred = await signInWithPopup(auth, provider)
+    localStorage.setItem('currentUser', JSON.stringify({ uid: cred.user.uid, email: cred.user.email }))
+    router.push('/analytics')
+  } catch (e) {
+    errorMsg.value = e.message || 'Google login failed'
   }
 }
 </script>
+
+<template>
+  <div class="login">
+    <h1>Login</h1>
+    <input v-model="email" placeholder="Email" type="email" />
+    <input v-model="password" placeholder="Password" type="password" />
+    <button :disabled="loading" @click="loginEmail">Login</button>
+    <button :disabled="loading" @click="loginGoogle">Sign in with Google</button>
+    <p v-if="errorMsg" role="alert">{{ errorMsg }}</p>
+  </div>
+</template>

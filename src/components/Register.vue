@@ -1,53 +1,126 @@
-<template>
-  <div class="container mt-5" style="max-width: 500px;">
-    <h2 class="mb-4">Register</h2>
-    <form @submit.prevent="handleRegister">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input v-model="username" type="text" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input v-model="email" type="email" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input v-model="password" type="password" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Role</label>
-        <select v-model="role" class="form-select" required>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-success w-100">Register</button>
-    </form>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { auth, db } from '../firebase'
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 
-const username = ref('')
+const router = useRouter()
+const route = useRoute()
+
+const displayName = ref('')
 const email = ref('')
 const password = ref('')
-const role = ref('user')
-const router = useRouter()
+const confirm = ref('')
 
-const handleRegister = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]')
+const loading = ref(false)
+const err = ref('')
 
-  if (users.find(u => u.email === email.value)) {
-    alert('Email already registered!')
-    return
+function afterLoginTarget() {
+  return (route.query.redirect && String(route.query.redirect)) || '/'
+}
+
+async function createProfileDoc(u, role = 'user') {
+  await setDoc(doc(db, 'users', u.uid), {
+    uid: u.uid,
+    email: u.email || '',
+    displayName: u.displayName || displayName.value || '',
+    role,                        
+    createdAt: serverTimestamp()
+  }, { merge: true })
+}
+
+async function submitEmail() {
+  err.value = ''
+  if (!displayName.value.trim()) { err.value = 'Display name is required.'; return }
+  if (!email.value.trim()) { err.value = 'Email is required.'; return }
+  if (password.value.length < 6) { err.value = 'Password must be at least 6 characters.'; return }
+  if (password.value !== confirm.value) { err.value = 'Passwords do not match.'; return }
+
+  try {
+    loading.value = true
+    const cred = await createUserWithEmailAndPassword(auth, email.value.trim(), password.value)
+    if (displayName.value.trim()) {
+      await updateProfile(cred.user, { displayName: displayName.value.trim() })
+    }
+    await createProfileDoc(cred.user, 'user')
+
+    localStorage.setItem('currentUser', JSON.stringify({
+      uid: cred.user.uid,
+      email: cred.user.email,
+      displayName: displayName.value.trim(),
+      role: 'user'
+    }))
+    router.replace(afterLoginTarget()) 
+  } catch (e) {
+    err.value = e?.message || 'Registration failed.'
+  } finally {
+    loading.value = false
   }
+}
 
-  const newUser = { username: username.value, email: email.value, password: password.value, role: role.value }
-  users.push(newUser)
-  localStorage.setItem('users', JSON.stringify(users))
-  alert('Registration successful! You can now login.')
-  router.push('/login')
+async function signupGoogle() {
+  err.value = ''
+  try {
+    loading.value = true
+    const provider = new GoogleAuthProvider()
+    const cred = await signInWithPopup(auth, provider)
+    await createProfileDoc(cred.user, 'user')
+    localStorage.setItem('currentUser', JSON.stringify({
+      uid: cred.user.uid,
+      email: cred.user.email,
+      displayName: cred.user.displayName || '',
+      role: 'user'
+    }))
+    router.replace(afterLoginTarget())
+  } catch (e) {
+    err.value = e?.message || 'Google signup failed.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
+
+<template>
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <h1 class="mb-3">Create Account</h1>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">Display name</label>
+            <input id="name" v-model="displayName" type="text" class="form-control" required aria-required="true" />
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" v-model="email" type="email" class="form-control" required aria-required="true" />
+          </div>
+
+          <div class="mb-3">
+            <label for="pw" class="form-label">Password</label>
+            <input id="pw" v-model="password" type="password" minlength="6" class="form-control" required aria-required="true" />
+          </div>
+
+          <div class="mb-3">
+            <label for="cpw" class="form-label">Confirm password</label>
+            <input id="cpw" v-model="confirm" type="password" minlength="6" class="form-control" required aria-required="true" />
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" :disabled="loading" @click="submitEmail">
+              {{ loading ? 'Creating...' : 'Create with Email' }}
+            </button>
+            <button class="btn btn-outline-secondary" :disabled="loading" @click="signupGoogle">
+              Continue with Google
+            </button>
+          </div>
+
+          <p v-if="err" class="text-danger mt-3" role="alert" aria-live="assertive">{{ err }}</p>
+          <p class="mt-3 mb-0">Already have an account? <router-link to="/login">Login</router-link></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

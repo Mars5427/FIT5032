@@ -1,20 +1,20 @@
 [
-  {
-    "id": 1,
-    "name": "Stress Busters 101",
-    "date": "2025-10-20",
-    "location": "Melbourne CBD"
-  },
-  {
-    "id": 2,
-    "name": "Mindful Mondays",
-    "date": "2025-10-27",
-    "location": "Clayton"
-  },
-  {
-    "id": 3,
-    "name": "Peer Support Circle",
-    "date": "2025-11-03",
-    "location": "Caulfield"
-  }
+  { "id": 1, "name": "Stress Busters 101", "date": "2025-10-20", "location": "Melbourne CBD" },
+  { "id": 2, "name": "Mindful Mondays", "date": "2025-10-27", "location": "Clayton" },
+  { "id": 3, "name": "Peer Support Circle", "date": "2025-11-03", "location": "Caulfield" },
+  { "id": 4, "name": "Art Therapy Session", "date": "2025-11-10", "location": "Dandenong" },
+  { "id": 5, "name": "Music for the Mind", "date": "2025-11-17", "location": "Monash" },
+  { "id": 6, "name": "Yoga for Relaxation", "date": "2025-11-24", "location": "Clayton" },
+  { "id": 7, "name": "Nutrition & Mental Health", "date": "2025-12-01", "location": "Melbourne CBD" },
+  { "id": 8, "name": "Confidence Building", "date": "2025-12-08", "location": "Frankston" },
+  { "id": 9, "name": "Dealing with Anxiety", "date": "2025-12-15", "location": "Caulfield" },
+  { "id": 10, "name": "Group Meditation", "date": "2025-12-22", "location": "Melbourne CBD" },
+  { "id": 11, "name": "Social Skills Workshop", "date": "2025-12-29", "location": "Clayton" },
+  { "id": 12, "name": "Holiday Self-Care", "date": "2026-01-05", "location": "Frankston" },
+  { "id": 13, "name": "Study Stress Support", "date": "2026-01-12", "location": "Monash" },
+  { "id": 14, "name": "New Year Resolutions", "date": "2026-01-19", "location": "Caulfield" },
+  { "id": 15, "name": "Mindfulness for Teens", "date": "2026-01-26", "location": "Melbourne CBD" },
+  { "id": 16, "name": "Mental Health 101", "date": "2026-02-02", "location": "Clayton" },
+  { "id": 17, "name": "Journaling for Growth", "date": "2026-02-09", "location": "Caulfield" },
+  { "id": 18, "name": "Managing Screen Time", "date": "2026-02-16", "location": "Monash" }
 ]

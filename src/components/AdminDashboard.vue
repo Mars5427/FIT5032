@@ -1,3 +1,26 @@
+<script setup>
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth, db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
+
+const router = useRouter()
+
+onMounted(async () => {
+  const u = auth.currentUser
+  if (!u) {
+    router.replace({ path: '/login', query: { redirect: '/admin' } })
+    return
+  }
+  const snap = await getDoc(doc(db, 'users', u.uid))
+  const role = snap.exists() ? (snap.data().role || 'user') : 'user'
+  if (role !== 'admin') {
+    router.replace('/unauthorized')
+  }
+})
+</script>
+
+
 <template>
   <div class="container mt-4">
     <h2>🛠️ Admin Dashboard</h2>

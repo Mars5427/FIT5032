@@ -1,5 +1,15 @@
 [
   { "id": 1, "title": "Mindfulness Basics", "category": "Education", "source": "Headspace", "url": "https://www.headspace.com" },
   { "id": 2, "title": "Youth Helpline", "category": "Support", "source": "Lifeline", "url": "https://www.lifeline.org.au" },
-  { "id": 3, "title": "Coping with Exam Stress", "category": "Article", "source": "ReachOut", "url": "https://au.reachout.com" }
+  { "id": 3, "title": "Coping with Exam Stress", "category": "Article", "source": "ReachOut", "url": "https://au.reachout.com" },
+  { "id": 4, "title": "Anxiety Management", "category": "Education", "source": "Beyond Blue", "url": "https://www.beyondblue.org.au" },
+  { "id": 5, "title": "Mindful Breathing Guide", "category": "Article", "source": "Smiling Mind", "url": "https://www.smilingmind.com.au" },
+  { "id": 6, "title": "Positive Thinking 101", "category": "Workshop", "source": "Mind Australia", "url": "https://www.mindaustralia.org.au" },
+  { "id": 7, "title": "Stress Management Toolkit", "category": "Resource", "source": "Head to Health", "url": "https://www.headtohealth.gov.au" },
+  { "id": 8, "title": "Youth Peer Support", "category": "Program", "source": "Orygen", "url": "https://www.orygen.org.au" },
+  { "id": 9, "title": "Sleep Hygiene Tips", "category": "Article", "source": "Better Health Vic", "url": "https://www.betterhealth.vic.gov.au" },
+  { "id": 10, "title": "Healthy Screen Time", "category": "Education", "source": "eSafety Commissioner", "url": "https://www.esafety.gov.au" },
+  { "id": 11, "title": "Emotional Regulation Skills", "category": "Support", "source": "ReachOut", "url": "https://au.reachout.com" },
+  { "id": 12, "title": "Self-Care for Students", "category": "Article", "source": "Headspace", "url": "https://www.headspace.com" },
+  { "id": 13, "title": "Building Resilience", "category": "Education", "source": "Beyond Blue", "url": "https://www.beyondblue.org.au" }
 ]
